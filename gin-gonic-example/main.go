@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -74,11 +77,74 @@ func setupRouter() *gin.Engine {
 			"tag":  "<br>",
 		}
 
-		// will output : {"lang":"GO\u8bed\u8a00","tag":"\u003cbr\u003e"}
 		c.AsciiJSON(http.StatusOK, data)
 	})
 
+	//Bind form-data request with custom struct
+	r.GET("/getb", GetDataB)
+
+	//Bind html checkboxes
+	r.POST("/formHandler", FormHandler)
+
+	///Bind query string or post data
+	r.POST("/testing", startPage)
+
 	return r
+}
+
+type StructA struct {
+	FieldA string `form:"field_a"`
+}
+
+type StructB struct {
+	NestedStruct StructA
+	FieldB       string `form:"field_b"`
+}
+
+func GetDataB(c *gin.Context) {
+	var b StructB
+	c.Bind(&b)
+	c.JSON(200, gin.H{
+		"a": b.NestedStruct,
+		"b": b.FieldB,
+	})
+}
+
+type myForm struct {
+	Colors []string `form:"colors[]"`
+}
+
+func FormHandler(c *gin.Context) {
+	var fakeForm myForm
+	c.ShouldBind(&fakeForm)
+	c.JSON(200, gin.H{"color": fakeForm.Colors})
+}
+
+//Bind query string or post data
+
+type Person struct {
+	Name     string    `form:"name"`
+	Address  string    `form:"address"`
+	Birthday time.Time `form:"birthday" time_format:"2006-01-02" time_utc:"1"`
+}
+
+func startPage(c *gin.Context) {
+	var person Person
+	// If `GET`, only `Form` binding engine (`query`) used.
+	// If `POST`, first checks the `content-type` for `JSON` or `XML`, then uses `Form` (`form-data`).
+	// See more at https://github.com/gin-gonic/gin/blob/master/binding/binding.go#L48
+	if c.ShouldBind(&person) == nil {
+		log.Println(person.Name)
+		log.Println(person.Address)
+		log.Println(person.Birthday)
+	}
+
+	// Format the person struct data into the response string
+	response := fmt.Sprintf("Success: Name=%s, Address=%s, Birthday=%s",
+		person.Name, person.Address, person.Birthday)
+
+	// Send the formatted response
+	c.String(200, response)
 }
 
 func main() {
