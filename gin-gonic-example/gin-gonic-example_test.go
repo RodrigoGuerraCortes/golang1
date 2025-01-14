@@ -7,8 +7,9 @@ import (
 	"testing"
 )
 
+var router = setupRouter() // Initialize router once
+
 func TestAdminRouteUsingSetupRouter(t *testing.T) {
-	router := setupRouter() // Call the actual router setup from main.go
 
 	// Mock request
 	payload := `{"value":"test_value"}`
@@ -27,8 +28,6 @@ func TestAdminRouteUsingSetupRouter(t *testing.T) {
 }
 
 func TestAdminRouteUsingSetupRouterAuthorized(t *testing.T) {
-	router := setupRouter() // Call the actual router setup from main.go
-
 	// Mock request
 	payload := `{"value":"test_value"}`
 	req, _ := http.NewRequest("POST", "/admin", bytes.NewBufferString(payload))
@@ -43,4 +42,27 @@ func TestAdminRouteUsingSetupRouterAuthorized(t *testing.T) {
 	if w.Code != http.StatusUnauthorized {
 		t.Errorf("Expected status code 401, got %d", w.Code)
 	}
+}
+
+func TestSomeJSON(t *testing.T) {
+
+	// Create a GET request for the /someJSON route
+	req, _ := http.NewRequest("GET", "/someJSON", nil)
+
+	// Record the response
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	// Assertions
+	// Check the status code
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status code 200, got %d", w.Code)
+	}
+
+	// Check the response body
+	expectedResponse := `{"lang":"GO\u8bed\u8a00","tag":"\u003cbr\u003e"}`
+	if w.Body.String() != expectedResponse {
+		t.Errorf("Expected body %s, got %s", expectedResponse, w.Body.String())
+	}
+
 }
