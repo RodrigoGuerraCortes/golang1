@@ -155,3 +155,36 @@ func TestStartPage(t *testing.T) {
 		t.Errorf("Expected body %s, got %s", expectedResponse, w.Body.String())
 	}
 }
+
+func TestBindUri(t *testing.T) {
+
+	// Create a GET request for the /someJSON route
+	req, _ := http.NewRequest("GET", "/::nombre::/ffffffff-ffff-ffff-ffff-ffffffffffff", nil)
+
+	// Record the response
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	// Assertions
+	// Check the status code
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status code 200, got %d", w.Code)
+	}
+
+	// Check the response body
+	expectedResponse := `{"name":"::nombre::","uuid":{"ID":"ffffffff-ffff-ffff-ffff-ffffffffffff","Name":"::nombre::"}}`
+	if w.Body.String() != expectedResponse {
+		t.Errorf("Expected body %s, got %s", expectedResponse, w.Body.String())
+	}
+
+}
+
+func TestLoadTemplate(t *testing.T) {
+	_, err := loadTemplate()
+
+	t.Log(loadTemplate())
+
+	if err != nil {
+		t.Fatalf("Failed to load templates: %v", err)
+	}
+}

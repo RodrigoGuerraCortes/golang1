@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -89,7 +92,49 @@ func setupRouter() *gin.Engine {
 	///Bind query string or post data
 	r.POST("/testing", startPage)
 
+	//Bind Uri
+	r.GET("/:name/:id", func(c *gin.Context) {
+		var person PersonBindUri
+		if err := c.ShouldBindUri(&person); err != nil {
+			c.JSON(400, gin.H{"msg": err.Error()})
+			return
+		}
+		c.JSON(200, gin.H{"name": person.Name, "uuid": person})
+	})
+
+	// Load templates
+	t, err := loadTemplate()
+	if err != nil {
+		panic(err)
+	}
+	r.SetHTMLTemplate(t)
+
+	r.GET("/", ReturnTmpl)
+
 	return r
+}
+
+func ReturnTmpl(c *gin.Context) {
+	c.HTML(http.StatusOK, "/html/index.tmpl", nil)
+}
+
+// loadTemplate loads templates embedded by go-assets-builder
+func loadTemplate() (*template.Template, error) {
+	t := template.New("")
+	for name, file := range Assets.Files {
+		if file.IsDir() || !strings.HasSuffix(name, ".tmpl") {
+			continue
+		}
+		h, err := ioutil.ReadAll(file)
+		if err != nil {
+			return nil, err
+		}
+		t, err = t.New(name).Parse(string(h))
+		if err != nil {
+			return nil, err
+		}
+	}
+	return t, nil
 }
 
 type StructA struct {
@@ -145,6 +190,11 @@ func startPage(c *gin.Context) {
 
 	// Send the formatted response
 	c.String(200, response)
+}
+
+type PersonBindUri struct {
+	ID   string `uri:"id" binding:"required,uuid"`
+	Name string `uri:"name" binding:"required"`
 }
 
 func main() {
