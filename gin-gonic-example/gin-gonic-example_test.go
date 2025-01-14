@@ -26,7 +26,7 @@ func TestAdminRouteUsingSetupRouter(t *testing.T) {
 	}
 }
 
-func TestAdminRouteUsingSetupRouterBAD(t *testing.T) {
+func TestAdminRouteUsingSetupRouterAuthorized(t *testing.T) {
 	router := setupRouter() // Call the actual router setup from main.go
 
 	// Mock request

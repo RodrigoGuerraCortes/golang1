@@ -1,4 +1,4 @@
-module gin-gionic-example
+module gin-gonic-example
 
 go 1.23.4
 

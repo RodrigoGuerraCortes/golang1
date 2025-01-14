@@ -64,6 +64,20 @@ func setupRouter() *gin.Engine {
 		}
 	})
 
+	//Ejemplos de gin gonic web framework
+
+	//https://gin-gonic.com/docs/examples/ascii-json/
+
+	r.GET("/someJSON", func(c *gin.Context) {
+		data := map[string]interface{}{
+			"lang": "GO语言",
+			"tag":  "<br>",
+		}
+
+		// will output : {"lang":"GO\u8bed\u8a00","tag":"\u003cbr\u003e"}
+		c.AsciiJSON(http.StatusOK, data)
+	})
+
 	return r
 }
 
