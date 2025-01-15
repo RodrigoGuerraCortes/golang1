@@ -84,6 +84,59 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/testing": {
+            "post": {
+                "description": "Accepts form data and returns the formatted response as a string",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "default"
+                ],
+                "summary": "Process form data and display result",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Name of the person",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Address of the person",
+                        "name": "address",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Birthday of the person (YYYY-MM-DD)",
+                        "name": "birthday",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Formatted response with name, address, and birthday",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid form data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {

@@ -55,6 +55,46 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+  /testing:
+    post:
+      tags:
+      - default
+      summary: Process form data and display result
+      description: Accepts form data and returns the formatted response as a string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              required:
+              - address
+              - birthday
+              - name
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the person
+                address:
+                  type: string
+                  description: Address of the person
+                birthday:
+                  type: string
+                  description: Birthday of the person (YYYY-MM-DD)
+        required: true
+      responses:
+        "200":
+          description: "Formatted response with name, address, and birthday"
+          content:
+            text/plain:
+              schema:
+                type: string
+        "400":
+          description: Invalid form data
+          content:
+            text/plain:
+              schema:
+                type: object
+                additionalProperties: true
 components:
   schemas:
     main.ErrorResponse:

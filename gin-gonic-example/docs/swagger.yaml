@@ -64,6 +64,42 @@ paths:
             additionalProperties: true
             type: object
       summary: Show a JSON response
+  /testing:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Accepts form data and returns the formatted response as a string
+      parameters:
+      - description: Name of the person
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Address of the person
+        in: formData
+        name: address
+        required: true
+        type: string
+      - description: Birthday of the person (YYYY-MM-DD)
+        in: formData
+        name: birthday
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Formatted response with name, address, and birthday
+          schema:
+            type: string
+        "400":
+          description: Invalid form data
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Process form data and display result
+      tags:
+      - default
 securityDefinitions:
   BasicAuth:
     type: basic

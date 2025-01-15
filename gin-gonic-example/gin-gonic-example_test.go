@@ -182,6 +182,7 @@ func TestBindUri(t *testing.T) {
 
 }
 
+// TODO: Falta completar
 func TestLoadTemplate(t *testing.T) {
 	_, err := loadTemplate()
 
@@ -189,5 +190,21 @@ func TestLoadTemplate(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("Failed to load templates: %v", err)
+	}
+}
+
+// Reviwing the file openapi3.yml
+func TestSwaggerEndpoints(t *testing.T) {
+
+	req, _ := http.NewRequest("GET", "/swagger/openapi3.yaml", nil)
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status code 200, got %d", w.Code)
+	}
+
+	if w.Body.Len() == 0 {
+		t.Errorf("Expected non-empty body for OpenAPI 3.0 openapi3.yaml")
 	}
 }

@@ -34,14 +34,15 @@ func setupRouter() *gin.Engine {
 	// gin.DisableConsoleColor()
 	r := gin.Default()
 
-	// Server swagger 2.0 (doc.json)
-	r.StaticFile("/swagger/doc.json", "./docs/swagger.json")
+	/*
+		// Server swagger 2.0 (doc.json)
+		r.StaticFile("/swagger/doc.json", "./docs/swagger.json")
+		// Swagger UI pointing to Swagger 2.0
+		r.GET("/swagger/v2/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL("/swagger/doc.json")))
+	*/
 
 	// Serve OpenAPI 3.0 (openapi3.yaml)
 	r.StaticFile("/swagger/openapi3.yaml", "./docs/openapi3.yaml")
-
-	// Swagger UI pointing to Swagger 2.0
-	r.GET("/swagger/v2/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL("/swagger/doc.json")))
 
 	// Swagger UI pointing to OpenAPI 3.0
 	r.GET("/swagger/v3/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL("/swagger/openapi3.yaml")))
@@ -236,6 +237,18 @@ type Person struct {
 	Birthday time.Time `form:"birthday" time_format:"2006-01-02" time_utc:"1"`
 }
 
+// startPage godoc
+// @Summary      Process form data and display result
+// @Description  Accepts form data and returns the formatted response as a string
+// @Tags         default
+// @Accept       application/x-www-form-urlencoded
+// @Produce      plain
+// @Param        name      formData  string  true  "Name of the person"
+// @Param        address   formData  string  true  "Address of the person"
+// @Param        birthday  formData  string  true  "Birthday of the person (YYYY-MM-DD)"
+// @Success      200  {string}  string  "Formatted response with name, address, and birthday"
+// @Failure      400  {object}  map[string]interface{}  "Invalid form data"
+// @Router       /testing [post]
 func startPage(c *gin.Context) {
 	var person Person
 	// If `GET`, only `Form` binding engine (`query`) used.
