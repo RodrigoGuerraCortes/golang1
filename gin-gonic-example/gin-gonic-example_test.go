@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -61,6 +62,8 @@ func TestSomeJSON(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Errorf("Expected status code 200, got %d", w.Code)
 	}
+
+	log.Println("Response Body:", w.Body.String())
 
 	// Check the response body
 	expectedResponse := `{"lang":"GO\u8bed\u8a00","tag":"\u003cbr\u003e"}`

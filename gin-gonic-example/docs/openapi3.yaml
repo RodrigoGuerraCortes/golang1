@@ -1,0 +1,76 @@
+openapi: 3.0.1
+info:
+  title: Swagger Example API
+  description: This is a sample server celler server.
+  termsOfService: http://swagger.io/terms/
+  contact: {}
+  version: "1.0"
+servers:
+- url: //localhost:8080/
+paths:
+  /admin:
+    post:
+      tags:
+      - admin
+      summary: Ingresar datos especificos
+      description: Updates a value associated with a user after Basic Auth validation
+      requestBody:
+        description: Input Json con algun valor
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        "200":
+          description: "status: ok"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/main.SuccessResponse'
+        "400":
+          description: "error: invalid request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/main.ErrorResponse'
+        "401":
+          description: "error: unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/main.ErrorResponse'
+      security:
+      - BasicAuth: []
+      x-codegen-request-body-name: body
+  /someJSON:
+    get:
+      summary: Show a JSON response
+      description: Returns a simple JSON object
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+components:
+  schemas:
+    main.ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: invalid request
+    main.SuccessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+x-original-swagger-version: "2.0"

@@ -10,7 +10,22 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+
+	_ "gin-gonic-example/docs"
+
+	swaggerFiles "github.com/swaggo/files" // swagger embed files
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
+
+// @title           Swagger Example API
+// @version         1.0
+// @description     This is a sample server celler server.
+// @termsOfService  http://swagger.io/terms/
+
+// @host      localhost:8080
+// @BasePath  /
+
+// @securityDefinitions.basic  BasicAuth
 
 var db = make(map[string]string)
 
@@ -18,6 +33,18 @@ func setupRouter() *gin.Engine {
 	// Disable Console Color
 	// gin.DisableConsoleColor()
 	r := gin.Default()
+
+	// Server swagger 2.0 (doc.json)
+	r.StaticFile("/swagger/doc.json", "./docs/swagger.json")
+
+	// Serve OpenAPI 3.0 (openapi3.yaml)
+	r.StaticFile("/swagger/openapi3.yaml", "./docs/openapi3.yaml")
+
+	// Swagger UI pointing to Swagger 2.0
+	r.GET("/swagger/v2/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL("/swagger/doc.json")))
+
+	// Swagger UI pointing to OpenAPI 3.0
+	r.GET("/swagger/v3/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL("/swagger/openapi3.yaml")))
 
 	// Ping test
 	r.GET("/ping", func(c *gin.Context) {
@@ -56,32 +83,13 @@ func setupRouter() *gin.Engine {
 	  	-H 'content-type: application/json' \
 	  	-d '{"value":"bar"}'
 	*/
-	authorized.POST("admin", func(c *gin.Context) {
-		user := c.MustGet(gin.AuthUserKey).(string)
-
-		// Parse JSON
-		var json struct {
-			Value string `json:"value" binding:"required"`
-		}
-
-		if c.Bind(&json) == nil {
-			db[user] = json.Value
-			c.JSON(http.StatusOK, gin.H{"status": "ok"})
-		}
-	})
+	authorized.POST("admin", Admin)
 
 	//Ejemplos de gin gonic web framework
 
 	//https://gin-gonic.com/docs/examples/ascii-json/
 
-	r.GET("/someJSON", func(c *gin.Context) {
-		data := map[string]interface{}{
-			"lang": "GO语言",
-			"tag":  "<br>",
-		}
-
-		c.AsciiJSON(http.StatusOK, data)
-	})
+	r.GET("/someJSON", SomeJson)
 
 	//Bind form-data request with custom struct
 	r.GET("/getb", GetDataB)
@@ -112,6 +120,60 @@ func setupRouter() *gin.Engine {
 	r.GET("/", ReturnTmpl)
 
 	return r
+}
+
+// Admin godoc
+// @Summary      Ingresar datos especificos
+// @Description  Updates a value associated with a user after Basic Auth validation
+// @Tags         admin
+// @Accept       json
+// @Produce      json
+// @Security     BasicAuth
+// @Param        body  body      object  true  "Input Json con algun valor"
+// @Success      200   {object}  SuccessResponse  "status: ok"
+// @Failure      400   {object}  ErrorResponse    "error: invalid request"
+// @Failure      401   {object}  ErrorResponse    "error: unauthorized"
+// @Router       /admin [post]
+func Admin(c *gin.Context) {
+	user := c.MustGet(gin.AuthUserKey).(string)
+
+	// Parse JSON
+	var json struct {
+		Value string `json:"value" binding:"required"`
+	}
+
+	if c.Bind(&json) == nil {
+		db[user] = json.Value
+		c.JSON(http.StatusOK, SuccessResponse{Status: "ok"})
+	} else {
+		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid request"})
+	}
+}
+
+// SuccessResponse represents a successful response
+type SuccessResponse struct {
+	Status string `json:"status" example:"ok"`
+}
+
+// ErrorResponse represents an error response
+type ErrorResponse struct {
+	Error string `json:"error" example:"invalid request"`
+}
+
+// SomeJson godoc
+// @Summary      Show a JSON response
+// @Description  Returns a simple JSON object
+// @Produce      json
+// @Success      200  {object}  map[string]interface{}  "Successful Response"
+// @Router       /someJSON [get]
+func SomeJson(c *gin.Context) {
+
+	data := map[string]interface{}{
+		"lang": "GO语言",
+		"tag":  "<br>",
+	}
+
+	c.AsciiJSON(http.StatusOK, data)
 }
 
 func ReturnTmpl(c *gin.Context) {
@@ -161,6 +223,7 @@ type myForm struct {
 
 func FormHandler(c *gin.Context) {
 	var fakeForm myForm
+
 	c.ShouldBind(&fakeForm)
 	c.JSON(200, gin.H{"color": fakeForm.Colors})
 }

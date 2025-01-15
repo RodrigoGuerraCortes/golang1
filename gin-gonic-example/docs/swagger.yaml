@@ -1,0 +1,70 @@
+basePath: /
+definitions:
+  main.ErrorResponse:
+    properties:
+      error:
+        example: invalid request
+        type: string
+    type: object
+  main.SuccessResponse:
+    properties:
+      status:
+        example: ok
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a sample server celler server.
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /admin:
+    post:
+      consumes:
+      - application/json
+      description: Updates a value associated with a user after Basic Auth validation
+      parameters:
+      - description: Input Json con algun valor
+        in: body
+        name: body
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'status: ok'
+          schema:
+            $ref: '#/definitions/main.SuccessResponse'
+        "400":
+          description: 'error: invalid request'
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "401":
+          description: 'error: unauthorized'
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      security:
+      - BasicAuth: []
+      summary: Ingresar datos especificos
+      tags:
+      - admin
+  /someJSON:
+    get:
+      description: Returns a simple JSON object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful Response
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Show a JSON response
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
